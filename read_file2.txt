@@ -1,0 +1,3 @@
+水戸,みと,Mito
+日立,ひたち,Hitachi
+筑波,つくば,Tsukuba
