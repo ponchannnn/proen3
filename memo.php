@@ -33,10 +33,18 @@
     ?>
     <?php
     if (isset($_POST["newusername"]) && isset($_POST["newpass"])) {
-        mkdir("memo/{$_POST['newsuername']}");
-        $f = fopen("memo/{$_POST["newusername"]}/p.p", "w");
-        fwrite($f, $_POST["newpass"]) or die("Cant create your account.");
-        fclose($f);
+        // array of username
+        $users = glob("memo/*"); // get name from file
+        $userArray = [];
+        foreach($users as $user) $userArray.array_push(substr($user, 5)); // add exist username to array
+        if ($userArray.array_search($_POST["newusername"])) {
+            print "console.log('Exist this name')";
+        } else {
+            mkdir("memo/{$_POST['newsuername']}");
+            $f = fopen("memo/{$_POST["newusername"]}/p.p", "w");
+            fwrite($f, $_POST["newpass"]) or die("Cant create your account.");
+            fclose($f);
+        }
     }
     ?>
     <script type="text/javascript">
@@ -63,14 +71,13 @@
 </head>
 <body>
     <h1 style="text-align: center;">メモ帳</h1>
-    <form method="GET">
-        <input name="signup" type="submit" value="サインアップ"/>
-    </form>
-    <br/>
     <?php
     global $FLAG;
     if ($FLAG == 0) {
         print <<< EOT
+        <form method="GET">
+        <input name="signup" type="submit" value="サインアップ"/>
+        </form>
         <select name="username" id="username" onchange="renewSite()">
         <option value="">--Please choose your name--</option>\n
         EOT;
@@ -105,12 +112,13 @@
         <input type="submit" value="保存"/>
         </form>
         EOT;
-    } else ($FLAG == 2) {
+    } else if ($FLAG == 2) {
         // sign up
-        rint <<< EOT
+        print <<< EOT
         <h2 style="text-align: left;">サインアップ</h2>
         <form method="POST" action="memo.php">
-        <input type="text" placeholder="Type your username" name="newusername">
+        <input type="text" placeholder="username" name="newusername">
+        <br/>
         <input name="newpass" type="password" maxlength="10" placeholder="password" required/>
         <input type="submit" value="保存"/>
         </form>
