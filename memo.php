@@ -78,6 +78,7 @@
         <form method="GET">
         <input name="signup" type="submit" value="サインアップ"/>
         </form>
+        <h2 style="text-align: left;">ログイン</h2>
         <select name="username" id="username" onchange="renewSite()">
         <option value="">--Please choose your name--</option>\n
         EOT;
@@ -90,8 +91,6 @@
         }
         print <<< EOT
         </select>
-        <br />
-        <br />
         <form method="POST" action="{$_SERVER['REQUEST_URI']}">
             <input id="pass" name="pass" type="password" maxlength="10" placeholder="password" required />
             <input type="submit"/>
@@ -106,7 +105,7 @@
 
         print <<< EOT
         <h2 style="text-align: left;">ログイン中</h2>
-        <input type="submit" value="ログアウト" onclick='location = "memo.php"' />
+        <input type="submit" value="ログアウト" onclick='location = "memo.php"'/>
         <form method="POST" action="{$_SERVER['REQUEST_URI']}">
         <textarea class="tarea" name="newText">$text</textarea>
         <input type="submit" value="保存"/>
@@ -115,6 +114,7 @@
     } else if ($FLAG == 2) {
         // sign up
         print <<< EOT
+        <input name="login" type="submit" value="ログイン" onclick='location = "memo.php"'/>
         <h2 style="text-align: left;">サインアップ</h2>
         <form method="POST" action="memo.php">
         <input type="text" placeholder="username" name="newusername">
