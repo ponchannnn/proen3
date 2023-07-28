@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8"/>
-    <title>メモ帳</title>
+    <title>メモ帳<?php global $FLAG; $FLAG? "-{$_GET['username']}" : "" ?></title>
     <?php
             if (isset($_GET["username"])) {
                 global $FLAG; // make global for is password correct
@@ -19,6 +19,13 @@
                 include ('404.php');
             }
             ?>
+    <?php
+        if (!isempty($_POST["newText"])) {
+            $f = fopen("memo/{$GET["username"]}/text", "w");
+            fwrite($f, $_POST["newText"]) or die("Cant write the content.");
+            fclose($f);
+        }
+    ?>
     <script type="text/javascript">
 
         // if choose username, renew site with GET
@@ -66,11 +73,10 @@
             <input id="pass" name="pass" type="password" maxlength="10" placeholder="password" required />
             <input type="submit"/>
         </form>
-        <br id="answer"></br>
         EOT;
     }  else {
         // read old memo
-        $f = fopen("memo/$UN/text", "r+");
+        $f = fopen("memo/$UN/text", "r");
         $text = "";
         while (($l = fgets($f))) $text .= $l;
         fclose($f);
