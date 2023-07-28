@@ -2,32 +2,44 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8"/>
-    <title>メモ帳<?php global $FLAG; $FLAG? "-{$_GET['username']}" : "" ?></title>
+    <title>メモ帳<?php global $FLAG; $FLAG == 1? "-{$_GET['username']}" : "" ?></title>
     <?php
-            if (isset($_GET["username"])) {
-                global $FLAG; // make global for is password correct
-                global $UN; // make global username for slot
-                $UN = $_GET["username"];
-                $pass = $_POST["pass"];
-                $f = fopen("memo/$UN/p.p", "r");
-                $password = fgets($f, 10);
-                fclose($f);
-                if ($password == $pass) $FLAG = TRUE;
-                else $FLAG = FALSE;
-            } else {
-                header("HTTP/1.1 404 Not Found");
-                include ('404.php');
-            }
-            ?>
+        global $FLAG; // make global for is password correct
+        global $UN; // make global username for slot
+
+        $FLAG == 0;
+
+        if (isset($_GET["username"])) {
+            $UN = $_GET["username"];
+            $pass = $_POST["pass"];
+            $f = fopen("memo/$UN/p.p", "r");
+            $password = fgets($f, 10);
+            fclose($f);
+            if ($password == $pass) $FLAG = 1;
+            else $FLAG = 0;
+        } else {
+            header("HTTP/1.1 404 Not Found");
+            include ('404.php');
+        }
+
+        if (isset($_GET["signup"])) $FLAG = 2;
+    ?>
     <?php
-        if (!isempty($_POST["newText"])) {
-            $f = fopen("memo/{$GET["username"]}/text", "w");
+        if (!empty($_POST["newText"])) {
+            $f = fopen("memo/{$_GET["username"]}/text", "w");
             fwrite($f, $_POST["newText"]) or die("Cant write the content.");
             fclose($f);
         }
     ?>
+    <?php
+    if (isset($_POST["newusername"]) && isset($_POST["newpass"])) {
+        mkdir("memo/{$_POST['newsuername']}");
+        $f = fopen("memo/{$_POST["newusername"]}/p.p", "w");
+        fwrite($f, $_POST["newpass"]) or die("Cant create your account.");
+        fclose($f);
+    }
+    ?>
     <script type="text/javascript">
-
         // if choose username, renew site with GET
         function renewSite () {
             const username = document.getElementById("username").value;
@@ -51,19 +63,23 @@
 </head>
 <body>
     <h1 style="text-align: center;">メモ帳</h1>
+    <form method="GET">
+        <input name="signup" type="submit" value="サインアップ"/>
+    </form>
+    <br/>
     <?php
     global $FLAG;
-    if (!$FLAG) {
+    if ($FLAG == 0) {
         print <<< EOT
         <select name="username" id="username" onchange="renewSite()">
-        <option value="">--Please choose your name--</option>
+        <option value="">--Please choose your name--</option>\n
         EOT;
         $users = glob("memo/*"); // get name from file
         foreach($users as $user) {
             $subeduser = substr($user, 5); // cut memo/
             print "<option ";
             if ($UN == $subeduser) print "selected"; // if get username, fix slot
-            print ">".$subeduser."</option>"; 
+            print ">".$subeduser."</option>\n"; 
         }
         print <<< EOT
         </select>
@@ -74,7 +90,7 @@
             <input type="submit"/>
         </form>
         EOT;
-    }  else {
+    }  else if ($FLAG == 1) {
         // read old memo
         $f = fopen("memo/$UN/text", "r");
         $text = "";
@@ -86,6 +102,16 @@
         <input type="submit" value="ログアウト" onclick='location = "memo.php"' />
         <form method="POST" action="{$_SERVER['REQUEST_URI']}">
         <textarea class="tarea" name="newText">$text</textarea>
+        <input type="submit" value="保存"/>
+        </form>
+        EOT;
+    } else ($FLAG == 2) {
+        // sign up
+        rint <<< EOT
+        <h2 style="text-align: left;">サインアップ</h2>
+        <form method="POST" action="memo.php">
+        <input type="text" placeholder="Type your username" name="newusername">
+        <input name="newpass" type="password" maxlength="10" placeholder="password" required/>
         <input type="submit" value="保存"/>
         </form>
         EOT;
