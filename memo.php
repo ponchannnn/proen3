@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8"/>
-    <title>メモ帳<?php global $FLAG; $FLAG == 1? "-{$_GET['username']}" : "" ?></title>
+    <title>メモ帳<?php isset($_POST["pass"])? "-{$_GET['username']}" : "" ?></title>
     <?php
         global $FLAG; // make global for is password correct
         global $UN; // make global username for slot
@@ -11,15 +11,14 @@
 
         if (isset($_GET["username"])) {
             $UN = $_GET["username"];
-            $pass = $_POST["pass"];
-            $f = fopen("memo/$UN/p.p", "r");
-            $password = fgets($f, 10);
-            fclose($f);
-            if ($password == $pass) $FLAG = 1;
-            else $FLAG = 0;
-        } else {
-            header("HTTP/1.1 404 Not Found");
-            include ('404.php');
+            if (isset($_POST["pass"])) {
+                $pass = $_POST["pass"];
+                $f = fopen("memo/$UN/p.p", "r");
+                $password = fgets($f, 10);
+                fclose($f);
+                if ($password == $pass) $FLAG = 1;
+                else $FLAG = 0;
+            } else $FLAG = 0;
         }
 
         if (isset($_GET["signup"])) $FLAG = 2;
@@ -29,21 +28,28 @@
             $f = fopen("memo/{$_GET["username"]}/text", "w");
             fwrite($f, $_POST["newText"]) or die("Cant write the content.");
             fclose($f);
+
+            print "<script>alert('Saved the content!');</script>";
         }
     ?>
     <?php
     if (isset($_POST["newusername"]) && isset($_POST["newpass"])) {
+        $newusername = $_POST["newusername"];
         // array of username
         $users = glob("memo/*"); // get name from file
         $userArray = [];
-        foreach($users as $user) $userArray.array_push(substr($user, 5)); // add exist username to array
-        if ($userArray.array_search($_POST["newusername"])) {
-            print "console.log('Exist this name')";
+        foreach($users as $user) array_push($userArray, substr($user, 5)); // add exist username to array
+
+        if (array_search($_POST["newusername"], $userArray)) {
+            print "<script>alert('Exist this name');</script>";
         } else {
-            mkdir("memo/{$_POST['newsuername']}");
-            $f = fopen("memo/{$_POST["newusername"]}/p.p", "w");
+            mkdir("memo/$newusername");
+
+            $f = fopen("memo/$newusername/p.p", "w");
             fwrite($f, $_POST["newpass"]) or die("Cant create your account.");
             fclose($f);
+
+            print "<script>alert('Create $newusername!');</script>";
         }
     }
     ?>
@@ -65,7 +71,7 @@
             background: #f2f2f2;
             margin: 0.5em 0;
             line-height: 1.5;
-            height: 6em;
+            height: 24em;
         }
 </style>
 </head>
